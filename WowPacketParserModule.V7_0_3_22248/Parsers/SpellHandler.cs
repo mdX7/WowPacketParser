@@ -346,7 +346,7 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
 
                     if (hasRemaining)
                         auraEntry.Remaining = aura.MaxDuration;
-                    
+
                     if (hasTimeMod)
                         packet.ReadSingle("TimeMod");
 
@@ -571,13 +571,20 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
         public static void HandleTotemCreated(Packet packet)
         {
             packet.ReadByte("Slot");
-            packet.ReadPackedGuid128("Totem");
+            var guid = packet.ReadPackedGuid128("Totem");
             packet.ReadUInt32("Duration");
-            packet.ReadUInt32<SpellId>("SpellID");
+            var spellId = packet.ReadUInt32<SpellId>("SpellID");
             packet.ReadSingle("TimeMod");
 
             packet.ResetBitReader();
             packet.ReadBit("CannotDismiss");
+
+            SpellTotemModel totem = new SpellTotemModel()
+            {
+                SpellID = spellId,
+                TotemGUID = guid
+            };
+            Storage.SpellTotemModels.Add(totem);
         }
 
         [Parser(Opcode.SMSG_SPELL_CHANNEL_START, ClientVersionBuild.V7_2_0_23826)]

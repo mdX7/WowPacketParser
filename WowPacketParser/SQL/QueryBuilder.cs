@@ -337,7 +337,7 @@ namespace WowPacketParser.SQL
                 if (value == null)
                     continue;
 
-                if (field.Item2.Name != "VerifiedBuild" || !Settings.SkipOnlyVerifiedBuildUpdateRows)
+                if (field.Item2.Name != "VerifiedBuild")
                     hasValues = true;
 
                 query.Append(field.Item1);

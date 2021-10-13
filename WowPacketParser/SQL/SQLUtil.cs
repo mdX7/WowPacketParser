@@ -209,17 +209,19 @@ namespace WowPacketParser.SQL
 
             var rowsIns = new RowList<T>();
             var rowsUpd = new Dictionary<Row<T>, RowList<T>>();
+            var rowsUpdVerifiedBuild = new Dictionary<int, RowList<T>>();
 
             foreach (var elem1 in storeList)
             {
                 if (dbList != null && dbList.ContainsKey(elem1.Item1) && !Settings.ForceInsertQueries) // update
                 {
-
                     var lastField = fields[fields.Count - 1];
                     var verBuildField = fields.FirstOrDefault(f => f.Item2.Name == "VerifiedBuild");
+                    int buildvSniff = 0;
+
                     if (verBuildField != null)
                     {
-                        var buildvSniff = (int)lastField.Item2.GetValue(elem1.Item1);
+                        buildvSniff = (int)lastField.Item2.GetValue(elem1.Item1);
                         var buildvDB = (int)lastField.Item2.GetValue(dbList[elem1.Item1].Data);
 
                         if (buildvDB > buildvSniff) // skip update if DB already has a VerifiedBuild higher than this one
@@ -228,6 +230,9 @@ namespace WowPacketParser.SQL
 
                     var row = new Row<T>();
                     var elem2 = dbList[elem1.Item1].Data;
+
+                    int equalFieldsCounter = 0;
+                    bool onlyVerifiedBuild = true;
 
                     foreach (var field in fields)
                     {
@@ -238,6 +243,7 @@ namespace WowPacketParser.SQL
                         if (arr1 != null)
                         {
                             var arr2 = (Array)val2;
+                            bool isArrayEqual = true;
 
                             for (var i = 0; i < field.Item3.First().Count; i++)
                             {
@@ -246,8 +252,12 @@ namespace WowPacketParser.SQL
 
                                 if (Utilities.EqualValues(value1, value2))
                                     arr1.SetValue(null, i);
+                                else
+                                    isArrayEqual = false;
                             }
                             field.Item2.SetValue(elem1.Item1, arr1);
+                            if (isArrayEqual)
+                                equalFieldsCounter++;
                             continue;
                         }
 
@@ -258,7 +268,23 @@ namespace WowPacketParser.SQL
                             val1 = ((string)val1).Replace(Environment.NewLine, "\n");
 
                         if (Utilities.EqualValues(val1, val2))
+                        {
                             field.Item2.SetValue(elem1.Item1, null);
+                            equalFieldsCounter++;
+                        }
+                        else
+                        {
+                            if (field.Item3.First().Name != "VerifiedBuild")
+                                onlyVerifiedBuild = false;
+                        }
+                    }
+
+                    if (equalFieldsCounter == (fields.Count - 1) && onlyVerifiedBuild)
+                    {
+                        if (!rowsUpdVerifiedBuild.ContainsKey(buildvSniff))
+                            rowsUpdVerifiedBuild.Add(buildvSniff, new RowList<T>());
+                        rowsUpdVerifiedBuild[buildvSniff].Add(elem2);
+                        continue;
                     }
 
                     row.Comment = commentSetter(elem2);
@@ -277,9 +303,16 @@ namespace WowPacketParser.SQL
                     rowsIns.Add(row);
                 }
             }
+            StringBuilder vbRowsBuilder = new StringBuilder();
+            foreach (var p in rowsUpdVerifiedBuild)
+            {
+                vbRowsBuilder.Append($"UPDATE {SQLUtil.GetTableName<T>()} SET `VerifiedBuild`={p.Key} WHERE {(new SQLWhere<T>(p.Value, true)).Build()};");
+                vbRowsBuilder.Append(Environment.NewLine);
+            }
 
             return new SQLInsert<T>(rowsIns).Build() + Environment.NewLine +
-                   new SQLUpdate<T>(rowsUpd).Build();
+                   new SQLUpdate<T>(rowsUpd).Build() + Environment.NewLine +
+                   vbRowsBuilder.ToString();
         }
 
         /// <summary>

@@ -188,6 +188,7 @@ namespace WowPacketParser.Enums
         [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_DISPLAY_POWER,
         UNIT_FIELD_DISPLAY_SCALE,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_EFFECTIVE_LEVEL,
         UNIT_FIELD_END,
         [UpdateField(UpdateFieldType.Custom)]
@@ -252,9 +253,13 @@ namespace WowPacketParser.Enums
         UNIT_FIELD_NATIVEDISPLAYID,
         UNIT_FIELD_NATIVE_X_DISPLAY_SCALE,
         UNIT_FIELD_NEGSTAT,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_NEGSTAT0,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_NEGSTAT1,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_NEGSTAT2,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_NEGSTAT3,
         UNIT_FIELD_NEGSTAT4,
         UNIT_FIELD_OFF_HAND_WEAPON_ATTACK_POWER,
@@ -265,9 +270,13 @@ namespace WowPacketParser.Enums
         UNIT_FIELD_PETNUMBER,
         UNIT_FIELD_PET_NAME_TIMESTAMP,
         UNIT_FIELD_POSSTAT,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_POSSTAT0,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_POSSTAT1,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_POSSTAT2,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_POSSTAT3,
         UNIT_FIELD_POSSTAT4,
         UNIT_FIELD_POWER,
@@ -315,9 +324,13 @@ namespace WowPacketParser.Enums
         [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_SCALING_LEVEL_DELTA,
         UNIT_FIELD_STAT,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_STAT0,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_STAT1,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_STAT2,
+        [UpdateField(UpdateFieldType.Int)]
         UNIT_FIELD_STAT3,
         UNIT_FIELD_STAT4,
         UNIT_FIELD_STATE_ANIM_ID,

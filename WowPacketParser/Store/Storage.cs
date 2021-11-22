@@ -143,6 +143,8 @@ namespace WowPacketParser.Store
         public static readonly DataBag<PlayerChoiceResponseRewardFactionTemplate> PlayerChoiceResponseRewardFactions = new DataBag<PlayerChoiceResponseRewardFactionTemplate>(new List<SQLOutput> { SQLOutput.playerchoice });
         public static readonly DataBag<PlayerChoiceResponseRewardItemTemplate> PlayerChoiceResponseRewardItems = new DataBag<PlayerChoiceResponseRewardItemTemplate>(new List<SQLOutput> { SQLOutput.playerchoice });
 
+        public static readonly StoreDictionary<(Class? /*classId*/, int? /*level*/), PlayerClassLevelStats> PlayerClassLevelStatsContainer = new StoreDictionary<(Class?, int?), PlayerClassLevelStats>(new List<SQLOutput> { SQLOutput.player_classlevelstats });
+
         public static void ClearContainers()
         {
             SniffData.Clear();
@@ -248,6 +250,8 @@ namespace WowPacketParser.Store
             PlayerChoiceResponseRewardCurrencies.Clear();
             PlayerChoiceResponseRewardFactions.Clear();
             PlayerChoiceResponseRewardItems.Clear();
+
+            PlayerClassLevelStatsContainer.Clear();
         }
     }
 }

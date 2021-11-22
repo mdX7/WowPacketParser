@@ -48,6 +48,7 @@
         playerchoice_locale,
         playercreateinfo,
         playercreateinfo_action,
+        player_classlevelstats,
         points_of_interest,
         quest_poi,
         quest_poi_points,

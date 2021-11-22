@@ -167,5 +167,61 @@ namespace WowPacketParser.SQL.Builders
 
             return SQLUtil.Compare(Storage.Scenes, templateDb, StoreNameType.None);
         }
+
+        [BuilderMethod]
+        public static string PlayerClassLevelStats()
+        {
+            if (Storage.PlayerClassLevelStatsContainer.IsEmpty())
+                return string.Empty;
+
+            var store = Storage.PlayerClassLevelStatsContainer.Values.OrderBy(x => x.Item1.Class).ThenBy(x => x.Item1.Level);
+
+            foreach (var stats in store)
+            {
+                var strEmpty = false;
+                var agiEmpty = false;
+                var intEmpty = false;
+                var staEmpty = false;
+
+                if (stats.Item1.Strength == 0)
+                    strEmpty = true;
+                if (stats.Item1.Agility == 0)
+                    agiEmpty = true;
+                if (stats.Item1.Intellect == 0)
+                    intEmpty = true;
+                if (stats.Item1.Stamina == 0)
+                    staEmpty = true;
+
+                // subtract racial values
+                if (SQLDatabase.PlayerRaceStats.Count > 0)
+                {
+                    var race = (int)stats.Item1.Race;
+                    if (!strEmpty)
+                        stats.Item1.Strength -= SQLDatabase.PlayerRaceStats[race][(int)StatType.Strength];
+                    if (!agiEmpty)
+                        stats.Item1.Agility -= SQLDatabase.PlayerRaceStats[race][(int)StatType.Agility];
+                    if (!intEmpty)
+                        stats.Item1.Intellect -= SQLDatabase.PlayerRaceStats[race][(int)StatType.Intellect];
+                    if (!staEmpty)
+                        stats.Item1.Stamina -= SQLDatabase.PlayerRaceStats[race][(int)StatType.Stamina];
+                    stats.Item1.Recalculated = true;
+                }
+
+                // make sure to use values from previous level if stat wasnt updated
+                var previousLevelStats = (stats.Item1.Class, stats.Item1.Level - 1);
+                if (strEmpty)
+                    stats.Item1.Strength = Storage.PlayerClassLevelStatsContainer.ContainsKey(previousLevelStats) ? Storage.PlayerClassLevelStatsContainer[previousLevelStats].Item1.Strength : null;
+                if (agiEmpty)
+                    stats.Item1.Agility = Storage.PlayerClassLevelStatsContainer.ContainsKey(previousLevelStats) ? Storage.PlayerClassLevelStatsContainer[previousLevelStats].Item1.Agility : null;
+                if (intEmpty)
+                    stats.Item1.Intellect = Storage.PlayerClassLevelStatsContainer.ContainsKey(previousLevelStats) ? Storage.PlayerClassLevelStatsContainer[previousLevelStats].Item1.Intellect : null;
+                if (staEmpty)
+                    stats.Item1.Stamina = Storage.PlayerClassLevelStatsContainer.ContainsKey(previousLevelStats) ? Storage.PlayerClassLevelStatsContainer[previousLevelStats].Item1.Stamina : null;
+            }
+
+            var db = SQLDatabase.Get(store, Settings.TDBDatabase);
+
+            return SQLUtil.Compare(store, db, x => $"{x.Race} {x.Class} {(x.Recalculated ? "recalculated" : "")}");
+        }
     }
 }

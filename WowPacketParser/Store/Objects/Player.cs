@@ -2,7 +2,7 @@ using WowPacketParser.Enums;
 
 namespace WowPacketParser.Store.Objects
 {
-    public sealed record Player : WoWObject
+    public sealed record Player : Unit
     {
         public Race Race;
 
@@ -24,6 +24,10 @@ namespace WowPacketParser.Store.Objects
             oldPlayer.Level = newPlayer.Level;
 
             return oldPlayer;
+        }
+
+        public override void LoadValuesFromUpdateFields()
+        {
         }
     }
 }

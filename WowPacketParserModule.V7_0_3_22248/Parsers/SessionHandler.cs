@@ -40,6 +40,8 @@ namespace WowPacketParserModule.V7_0_3_22248.Parsers
             packet.ReadSingle("FarClip");
             packet.Holder.PlayerLogin = new() { PlayerGuid = guid };
             WowPacketParser.Parsing.Parsers.SessionHandler.LoginGuid = guid;
+
+            WowPacketParser.Store.Storage.Objects[guid].Item1.Type = ObjectType.ActivePlayer;
         }
     }
 }

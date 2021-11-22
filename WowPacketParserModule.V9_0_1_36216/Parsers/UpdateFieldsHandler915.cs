@@ -890,6 +890,8 @@ namespace WowPacketParserModule.V9_0_1_36216.UpdateFields.V9_1_5_40772
                     data.Stats[i] = packet.ReadInt32("Stats", indexes, i);
                     data.StatPosBuff[i] = packet.ReadInt32("StatPosBuff", indexes, i);
                     data.StatNegBuff[i] = packet.ReadInt32("StatNegBuff", indexes, i);
+                    var baseStat = data.Stats[i] - data.StatPosBuff[i] - data.StatNegBuff[i];
+                    packet.AddValue("BaseStats", baseStat, indexes, i);
                 }
             }
             if ((flags & (UpdateFieldFlag.Owner | UpdateFieldFlag.Empath)) != UpdateFieldFlag.None)
@@ -1574,6 +1576,9 @@ namespace WowPacketParserModule.V9_0_1_36216.UpdateFields.V9_1_5_40772
                     {
                         data.StatNegBuff[i] = packet.ReadInt32("StatNegBuff", indexes, i);
                     }
+
+                    var baseStat = data.Stats[i] - data.StatPosBuff[i] - data.StatNegBuff[i];
+                    packet.AddValue("BaseStats", baseStat, indexes, i);
                 }
             }
             if (changesMask[173])

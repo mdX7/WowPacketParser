@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using WowPacketParser.Enums;
 using WowPacketParser.Misc;
@@ -101,6 +101,38 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                     else if (unit != null)
                                         unit.UnitData = data;
 
+                                    if (Settings.SQLOutputFlag.HasAnyFlagBit(SQLOutput.player_classlevelstats))
+                                    {
+                                        if (obj == null)
+                                            continue;
+
+                                        if (obj.Type != ObjectType.ActivePlayer)
+                                            continue;
+
+                                        var player = obj as Player;
+                                        if (data.Level == 0)
+                                            continue;
+
+                                        // we're not trusting these races due to their racial being in the base values and we are too lazy to calculate, sorry folks
+                                        if (player.Race == Race.Draenei || player.Race == Race.Tauren)
+                                            continue;
+
+                                        var level = data.Level;
+                                        if (data.EffectiveLevel != 0)
+                                            level = data.EffectiveLevel;
+
+                                        PlayerClassLevelStats stats = new PlayerClassLevelStats()
+                                        {
+                                            Race = player.Race,
+                                            Class = player.Class,
+                                            Level = (byte)level,
+                                            Strength = data.Stats[(int)StatType.Strength] - data.StatPosBuff[(int)StatType.Strength] - data.StatNegBuff[(int)StatType.Strength],
+                                            Agility = data.Stats[(int)StatType.Agility] - data.StatPosBuff[(int)StatType.Agility] - data.StatNegBuff[(int)StatType.Agility],
+                                            Intellect = data.Stats[(int)StatType.Intellect] - data.StatPosBuff[(int)StatType.Intellect] - data.StatNegBuff[(int)StatType.Intellect],
+                                            Stamina = data.Stats[(int)StatType.Stamina] - data.StatPosBuff[(int)StatType.Stamina] - data.StatNegBuff[(int)StatType.Stamina]
+                                        };
+                                        Storage.PlayerClassLevelStatsContainer.Add((player.Class, level), stats);
+                                    }
                                     updateValues.Fields.UpdateData(data);
                                 }
                                 if ((updateTypeFlag & 0x0040) != 0)
@@ -205,14 +237,40 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                             break;
                         }
                         case ObjectType.Player:
-                            handler.ReadCreateUnitData(fieldsData, flags, index);
+                            (obj as Unit).UnitData = handler.ReadCreateUnitData(fieldsData, flags, index);
                             handler.ReadCreatePlayerData(fieldsData, flags, index);
                             break;
                         case ObjectType.ActivePlayer:
-                            handler.ReadCreateUnitData(fieldsData, flags, index);
+                        {
+                            var unitData = handler.ReadCreateUnitData(fieldsData, flags, index);
                             handler.ReadCreatePlayerData(fieldsData, flags, index);
                             handler.ReadCreateActivePlayerData(fieldsData, flags, index);
+
+                            (obj as Unit).UnitData = unitData;
+                            if (Settings.SQLOutputFlag.HasAnyFlagBit(SQLOutput.player_classlevelstats))
+                            {
+                                // we're not trusting these races due to their racial being in the base values and we are too lazy to calculate, sorry folks
+                                if ((Race)unitData.Race == Race.Draenei || (Race)unitData.Race == Race.Tauren)
+                                    break;
+
+                                var level = unitData.Level;
+                                if (unitData.EffectiveLevel != 0)
+                                    level = unitData.EffectiveLevel;
+
+                                PlayerClassLevelStats stats = new PlayerClassLevelStats()
+                                {
+                                    Race = (Race)unitData.Race,
+                                    Class = (Class)unitData.ClassId,
+                                    Level = (byte)level,
+                                    Strength = unitData.Stats[(int)StatType.Strength] - unitData.StatPosBuff[(int)StatType.Strength] - unitData.StatNegBuff[(int)StatType.Strength],
+                                    Agility = unitData.Stats[(int)StatType.Agility] - unitData.StatPosBuff[(int)StatType.Agility] - unitData.StatNegBuff[(int)StatType.Agility],
+                                    Intellect = unitData.Stats[(int)StatType.Intellect] - unitData.StatPosBuff[(int)StatType.Intellect] - unitData.StatNegBuff[(int)StatType.Intellect],
+                                    Stamina = unitData.Stats[(int)StatType.Stamina] - unitData.StatPosBuff[(int)StatType.Stamina] - unitData.StatNegBuff[(int)StatType.Stamina]
+                                };
+                                Storage.PlayerClassLevelStatsContainer.Add(((Class)unitData.ClassId, level), stats);
+                            }
                             break;
+                        }
                         case ObjectType.GameObject:
                         {
                             var data = (obj as GameObject).GameObjectData = handler.ReadCreateGameObjectData(fieldsData, flags, index);

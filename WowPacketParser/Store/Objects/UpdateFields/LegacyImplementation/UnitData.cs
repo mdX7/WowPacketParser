@@ -172,5 +172,48 @@ namespace WowPacketParser.Store.Objects.UpdateFields.LegacyImplementation
             public ushort? ItemAppearanceModID { get; set; }
             public ushort? ItemVisual { get; set; }
         }
+
+        public byte Race => 0;
+
+        public int EffectiveLevel => UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_EFFECTIVE_LEVEL);
+
+        public int[] Stats
+        {
+            get
+            {
+                int[] stats = new int[4];
+                stats[0] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_STAT0);
+                stats[1] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_STAT1);
+                stats[2] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_STAT2);
+                stats[3] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_STAT3);
+                return stats;
+            }
+        }
+
+        public int[] StatPosBuff
+        {
+            get
+            {
+                int[] stats = new int[4];
+                stats[0] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_POSSTAT0);
+                stats[1] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_POSSTAT1);
+                stats[2] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_POSSTAT2);
+                stats[3] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_POSSTAT3);
+                return stats;
+            }
+        }
+
+        public int[] StatNegBuff
+        {
+            get
+            {
+                int[] stats = new int[4];
+                stats[0] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_NEGSTAT0);
+                stats[1] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_NEGSTAT1);
+                stats[2] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_NEGSTAT2);
+                stats[3] = UpdateFields.GetValue<UnitField, int>(UnitField.UNIT_FIELD_NEGSTAT3);
+                return stats;
+            }
+        }
     }
 }

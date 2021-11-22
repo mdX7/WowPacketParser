@@ -8,7 +8,7 @@ using WowPacketParser.Store.Objects.UpdateFields.LegacyImplementation;
 
 namespace WowPacketParser.Store.Objects
 {
-    public sealed record Unit : WoWObject
+    public record Unit : WoWObject
     {
         public List<Aura> Auras;
 

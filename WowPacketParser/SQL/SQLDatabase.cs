@@ -29,6 +29,7 @@ namespace WowPacketParser.SQL
         public static Dictionary<uint /*broadcastText*/, List<uint> /*npc_text ids*/> BroadcastToNPCTexts { get; } = new();
         public static Dictionary<int /*menuID*/, List<uint> /*npc_text ids*/> GossipMenuToNPCTexts { get; } = new();
         public static List<POIData> POIs { get; } = new List<POIData>();
+        public static Dictionary<int, int[]> PlayerRaceStats { get; } = new Dictionary<int, int[]>();
 
         private static readonly StoreNameType[] ObjectTypes =
         {
@@ -111,6 +112,7 @@ namespace WowPacketParser.SQL
             LoadNPCTexts();
             LoadGossipMenuNPCTexts();
             LoadNameData();
+            LoadPlayerRaceStats();
 
             var endTime = DateTime.Now;
             var span = DateTime.Now.Subtract(startTime);
@@ -350,6 +352,34 @@ namespace WowPacketParser.SQL
             {
                 NameStores.Add(StoreNameType.PhaseId, GetDict<int, string>(
                     $"SELECT `ID`, `Name` FROM {Settings.TDBDatabase}.phase_name;"));
+            }
+        }
+
+        private static void LoadPlayerRaceStats()
+        {
+            string query =
+                "SELECT race, str, agi, sta, inte " +
+                $"FROM {Settings.TDBDatabase}.player_racestats ORDER BY race;";
+            using (var command = SQLConnector.CreateCommand(query))
+            {
+                if (command == null)
+                    return;
+
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        byte race = Convert.ToByte(reader["race"]);
+                        int[] stats = new int[4];
+
+                        stats[(int)StatType.Strength] = Convert.ToInt32(reader["str"]);
+                        stats[(int)StatType.Agility] = Convert.ToInt32(reader["agi"]);
+                        stats[(int)StatType.Intellect] = Convert.ToInt32(reader["inte"]);
+                        stats[(int)StatType.Stamina] = Convert.ToInt32(reader["sta"]);
+
+                        PlayerRaceStats.Add(race, stats);
+                    }
+                }
             }
         }
 

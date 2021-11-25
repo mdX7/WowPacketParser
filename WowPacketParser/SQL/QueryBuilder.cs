@@ -361,6 +361,42 @@ namespace WowPacketParser.SQL
         }
     }
 
+    public class SQLUpdateVerifiedBuild<T> : ISQLQuery where T : IDataModel, new()
+    {
+        private readonly Dictionary<int, RowList<T>> _rows;
+
+        /// <summary>
+        /// Creates multiple update VerifiedBuild rows
+        /// </summary>
+        /// <param name="rows">A list of <see cref="SQLUpdateVerifiedBuild{T}"/> rows</param>
+        public SQLUpdateVerifiedBuild(Dictionary<int, RowList<T>> rows)
+        {
+            _rows = rows;
+        }
+
+        /// <summary>
+        /// Constructs the actual query
+        /// </summary>
+        /// <returns>Multiple update VerifiedBuild rows</returns>
+        public string Build()
+        {
+            if (_rows.Count == 0)
+                return string.Empty;
+
+            StringBuilder result = new StringBuilder();
+
+            var rowsOrdered = _rows.OrderBy(x => x.Key);
+
+            foreach (var rows in rowsOrdered)
+            {
+                result.Append($"UPDATE {SQLUtil.GetTableName<T>()} SET `VerifiedBuild`={rows.Key} WHERE {new SQLWhere<T>(rows.Value, true).Build()};");
+                result.Append(Environment.NewLine);
+            }
+
+            return result.ToString();
+        }
+    }
+
     public class SQLInsert<T> : ISQLQuery where  T : IDataModel, new()
     {
         private readonly RowList<T> _rows;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using WowPacketParser.DBC;
 using WowPacketParser.Enums;
 using WowPacketParser.Misc;
 using WowPacketParser.PacketStructures;
@@ -79,7 +81,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                         mut.UpdateData(data);
                                     else if (obj != null)
                                         obj.ObjectData = data;
-                                    
+
                                     updateValues.Fields.UpdateData(data);
                                 }
                                 if ((updateTypeFlag & 0x0002) != 0)
@@ -98,7 +100,65 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                         mut.UpdateData(data);
                                     else if (unit != null)
                                         unit.UnitData = data;
-                                    
+
+                                    bool hasResistances = false;
+                                    for (var k = 1; k < data.Resistances.Length; k++)
+                                    {
+                                        if (data.Resistances[i] == null || data.Resistances[i] == 0)
+                                            continue;
+
+                                        hasResistances = true;
+                                        break;
+                                    }
+
+                                    if (hasResistances)
+                                    {
+                                        StringBuilder[] modifyingAuras = new StringBuilder[unit.UnitData.Resistances.Length];
+                                        if (unit.Auras != null)
+                                        {
+                                            for (var k = 0; k < unit.Auras.Count; k++)
+                                            {
+                                                for (uint effectId = 0; effectId < 32; effectId++)
+                                                {
+                                                    var key = Tuple.Create(unit.Auras[k].SpellId, effectId);
+                                                    if (DBC.SpellEffectStores.TryGetValue(key, out var spellEffectEntry))
+                                                    {
+                                                        // SPELL_AURA_MOD_RESISTANCE SPELL_AURA_MOD_BASE_RESISTANCE SPELL_AURA_MOD_RESISTANCE_PCT SPELL_AURA_MOD_BASE_RESISTANCE_PCT
+                                                        if (spellEffectEntry.EffectAura != 22 && spellEffectEntry.EffectAura != 83 && spellEffectEntry.EffectAura != 101 && spellEffectEntry.EffectAura != 142)
+                                                            continue;
+
+                                                        short spellSchool = 1;
+                                                        for (spellSchool = 1; spellSchool < data.Resistances.Length; spellSchool++)
+                                                        {
+                                                            if ((spellEffectEntry.EffectMiscValue[0] & (1 << spellSchool)) == 0)
+                                                                continue;
+
+                                                            break;
+                                                        }
+                                                        if (modifyingAuras[spellSchool] == null)
+                                                            modifyingAuras[spellSchool] = new StringBuilder();
+
+                                                        modifyingAuras[spellSchool].Append($"{unit.Auras[k].SpellId} - ");
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        for (var k = 1; k < data.Resistances.Length; k++)
+                                        {
+                                            if (data.Resistances[k] == null || data.Resistances[k] == 0)
+                                                continue;
+
+                                            Storage.CreatureTemplateResistances.Add(new CreatureTemplateResistance
+                                            {
+                                                CreatureID = unit.Guid.GetEntry(),
+                                                School = (byte)k,
+                                                Resistance = (short?)data.Resistances[k],
+                                                ModifyingAuras = modifyingAuras[k] != null ? modifyingAuras[k].ToString() : ""
+                                            });
+                                        }
+                                    }
+
                                     updateValues.Fields.UpdateData(data);
                                 }
                                 if ((updateTypeFlag & 0x0040) != 0)
@@ -113,7 +173,7 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                         mut.UpdateData(data);
                                     else if (go != null)
                                         go.GameObjectData = data;
-                                    
+
                                     updateValues.Fields.UpdateData(data);
                                 }
                                 if ((updateTypeFlag & 0x0200) != 0)

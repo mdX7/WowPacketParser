@@ -203,6 +203,20 @@ namespace WowPacketParser.SQL.Builders
         }
 
         [BuilderMethod]
+        public static string CreatureTemplateResistance()
+        {
+            if (Storage.CreatureTemplateResistances.IsEmpty())
+                return string.Empty;
+
+            if (!Settings.SQLOutputFlag.HasAnyFlagBit(SQLOutput.creature_template))
+                return string.Empty;
+
+            var templatesDb = SQLDatabase.Get(Storage.CreatureTemplateResistances);
+
+            return SQLUtil.Compare(Settings.SQLOrderByKey ? Storage.CreatureTemplateResistances.OrderBy(x => x.Item1.CreatureID).ThenBy(x => x.Item1.School).ToArray() : Storage.CreatureTemplateResistances.ToArray(), templatesDb, x => x.ModifyingAuras);
+        }
+
+        [BuilderMethod]
         public static string NpcTrainer()
         {
             if (Storage.NpcTrainers.IsEmpty())

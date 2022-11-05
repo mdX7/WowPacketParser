@@ -103,7 +103,7 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
         public System.Nullable<int> TransportServerTime { get; set; }
         public System.Nullable<uint> WeeklyRewardsPeriodSinceOrigin { get; set; }
         public System.Nullable<short> DEBUGSoulbindConduitRank { get; set; }
-        public System.Nullable<int> Unk1000_3 { get; set; }
+        public System.Nullable<int> ActiveTraitConfigID { get; set; }
         public DynamicUpdateField<IResearch>[] Research { get; } = new DynamicUpdateField<IResearch>[1] { new DynamicUpdateField<IResearch>() };
         public DynamicUpdateField<System.Nullable<ulong>> KnownTitles { get; } = new DynamicUpdateField<System.Nullable<ulong>>();
         public DynamicUpdateField<System.Nullable<ushort>> ResearchSites { get; } = new DynamicUpdateField<System.Nullable<ushort>>();
@@ -133,7 +133,7 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
         public System.Nullable<bool> InsertItemsLeftToRight { get; set; }
         public DynamicUpdateField<IActivePlayerUnk1000> Unk1000 { get; } = new DynamicUpdateField<IActivePlayerUnk1000>();
         public DynamicUpdateField<ICharacterRestriction> CharacterRestrictions { get; } = new DynamicUpdateField<ICharacterRestriction>();
-        public DynamicUpdateField<IActivePlayerUnk1000_2> Unk1000_2 { get; } = new DynamicUpdateField<IActivePlayerUnk1000_2>();
+        public DynamicUpdateField<ITraitConfig> TraitConfigs { get; } = new DynamicUpdateField<ITraitConfig>();
     }
 }
 

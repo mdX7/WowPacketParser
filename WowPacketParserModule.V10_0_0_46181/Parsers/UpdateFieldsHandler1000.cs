@@ -2645,81 +2645,51 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
             return data;
         }
 
-        public static IActivePlayerUnk1000_2_field_8 ReadCreateActivePlayerUnk1000_2_field_8(Packet packet, params object[] indexes)
+        public static ITraitNode ReadCreateTraitNode(Packet packet, params object[] indexes)
         {
-            var data = new ActivePlayerUnk1000_2_field_8();
-            data.Field_0 = packet.ReadInt32("Field_0", indexes);
-            data.Field_4 = packet.ReadInt32("Field_4", indexes);
-            data.Field_8 = packet.ReadInt32("Field_8", indexes);
-            data.Field_C = packet.ReadInt32("Field_C", indexes);
+            var data = new TraitNode();
+            data.TraitNodeID = packet.ReadInt32("TraitNodeID", indexes);
+            data.TraitNodeEntry = packet.ReadInt32("TraitNodeEntry", indexes);
+            data.Rank = packet.ReadInt32("Rank", indexes);
+            data.TreeFlags = packet.ReadInt32("TreeFlags", indexes);
             return data;
         }
 
-        public static IActivePlayerUnk1000_2_field_8 ReadUpdateActivePlayerUnk1000_2_field_8(Packet packet, params object[] indexes)
+        public static ITraitConfig ReadCreateTraitConfig(Packet packet, params object[] indexes)
         {
-            var data = new ActivePlayerUnk1000_2_field_8();
-            var rawChangesMask = new int[1];
-            rawChangesMask[0] = (int)packet.ReadBits(5);
-            var changesMask = new BitArray(rawChangesMask);
-
+            var data = new TraitConfig();
             packet.ResetBitReader();
-            if (changesMask[0])
-            {
-                if (changesMask[1])
-                {
-                    data.Field_0 = packet.ReadInt32("Field_0", indexes);
-                }
-                if (changesMask[2])
-                {
-                    data.Field_4 = packet.ReadInt32("Field_4", indexes);
-                }
-                if (changesMask[3])
-                {
-                    data.Field_8 = packet.ReadInt32("Field_8", indexes);
-                }
-                if (changesMask[4])
-                {
-                    data.Field_C = packet.ReadInt32("Field_C", indexes);
-                }
-            }
-            return data;
-        }
-
-        public static IActivePlayerUnk1000_2 ReadCreateActivePlayerUnk1000_2(Packet packet, params object[] indexes)
-        {
-            var data = new ActivePlayerUnk1000_2();
-            packet.ResetBitReader();
-            data.Field_0 = packet.ReadInt32("Field_0", indexes);
+            data.ID = packet.ReadInt32("ID", indexes);
             data.Type = packet.ReadInt32("Type", indexes);
-            data.Field_8.Resize(packet.ReadUInt32());
+            data.TraitNode.Resize(packet.ReadUInt32());
             switch (data.Type)
             {
                 case 1:
-                    data.Field_14C = packet.ReadInt32("Field_14C", indexes);
-                    data.Field_150 = packet.ReadInt32("Field_150", indexes);
-                    data.Field_154 = packet.ReadInt32("Field_154", indexes);
+                    data.SpecializationID = packet.ReadInt32("SpecializationID", indexes);
+                    data.Flags = packet.ReadInt32("Flags", indexes);
+                    data.LoadoutIndex = packet.ReadInt32("LoadoutIndex", indexes);
                     break;
                 case 2:
-                    data.Field_148 = packet.ReadInt32("Field_148", indexes);
+                    data.SkillLineId = packet.ReadInt32("SkillLineId", indexes);
                     break;
                 case 3:
-                    data.Field_158 = packet.ReadInt32("Field_158", indexes);
+                    data.SystemID = packet.ReadInt32("SystemID", indexes);
                     break;
                 default:
                     break;
             }
-            for (var i = 0; i < data.Field_8.Count; ++i)
+            for (var i = 0; i < data.TraitNode.Count; ++i)
             {
-                data.Field_8[i] = ReadCreateActivePlayerUnk1000_2_field_8(packet, indexes, "Field_8", i);
+                data.TraitNode[i] = ReadCreateTraitNode(packet, indexes, "TraitNode", i);
             }
-            data.StrLen = packet.ReadBits("Field_C", 9, indexes);
-            data.Str = packet.ReadWoWString("Str", (int)data.StrLen, indexes);
+            data.LoadoutNameLen = packet.ReadBits("LoadoutNameLen", 9, indexes);
+            data.LoadoutName = packet.ReadWoWString("LoadoutName", (int)data.LoadoutNameLen, indexes);
             return data;
         }
 
-        public static IActivePlayerUnk1000_2 ReadUpdateActivePlayerUnk1000_2(Packet packet, params object[] indexes)
+        public static ITraitConfig ReadUpdateTraitConfigs(Packet packet, params object[] indexes)
         {
-            var data = new ActivePlayerUnk1000_2();
+            var data = new TraitConfig();
             var rawChangesMask = new int[12];
             rawChangesMask[0] = (int)packet.ReadBits(12);
             var changesMask = new BitArray(rawChangesMask);
@@ -2728,7 +2698,7 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
             {
                 if (changesMask[1])
                 {
-                    data.Field_8.ReadUpdateMask(packet);
+                    data.TraitNode.ReadUpdateMask(packet);
                 }
             }
             packet.ResetBitReader();
@@ -2736,68 +2706,46 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
             {
                 if (changesMask[1])
                 {
-                    for (var i = 0; i < data.Field_8.Count; ++i)
+                    for (var i = 0; i < data.TraitNode.Count; ++i)
                     {
-                        if (data.Field_8.UpdateMask[i])
+                        if (data.TraitNode.UpdateMask[i])
                         {
-                            data.Field_8[i] = ReadCreateActivePlayerUnk1000_2_field_8(packet, indexes, "Field_8", i);
+                            data.TraitNode[i] = ReadCreateTraitNode(packet, indexes, "TraitNode", i);
                         }
                     }
                 }
                 if (changesMask[2])
                 {
-                    data.Field_0 = packet.ReadInt32("Field_0", indexes);
-                }
-                if (changesMask[4])
-                {
-                    if (changesMask[5])
-                        data.Type = packet.ReadInt32("Type", indexes);
-                    switch (data.Type)
-                    {
-                        case 2:
-                        {
-                            if (changesMask[6])
-                                data.Field_148 = packet.ReadInt32("Field_148", indexes);
-                            break;
-                        }
-                        case 1:
-                        {
-                            if (changesMask[7])
-                                data.Field_14C = packet.ReadInt32("Field_14C", indexes);
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-                if (changesMask[8])
-                {
-                    switch (data.Type)
-                    {
-                        case 1:
-                        {
-                            if (changesMask[9])
-                                data.Field_150 = packet.ReadInt32("Field_150", indexes);
-                            if (changesMask[10])
-                                data.Field_154 = packet.ReadInt32("Field_154", indexes);
-                            break;
-                        }
-                        case 3:
-                        {
-                            if (changesMask[11])
-                                data.Field_158 = packet.ReadInt32("Field_158", indexes);
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-                if (changesMask[3])
-                {
-                    data.StrLen = packet.ReadBits(9);
-                    data.Str = packet.ReadWoWString("Str", (int)data.StrLen, indexes);
+                    data.ID = packet.ReadInt32("ID", indexes);
                 }
             }
+            if (changesMask[4])
+            {
+                if (changesMask[5])
+                    data.Type = packet.ReadInt32("Type", indexes);
+                if (changesMask[6] && data.Type == 2)
+                    data.SkillLineId = packet.ReadInt32("SkillLineId", indexes);
+                if (changesMask[7] && data.Type == 1)
+                    data.SpecializationID = packet.ReadInt32("SpecializationID", indexes);
+            }
+            if (changesMask[8])
+            {
+                if (changesMask[9] && data.Type == 1)
+                    data.Flags = packet.ReadInt32("CombatConfigFlags", indexes);
+                if (changesMask[10] && data.Type == 1)
+                    data.LoadoutIndex = packet.ReadInt32("LoadoutIndex", indexes);
+                if (changesMask[11] && data.Type == 3)
+                    data.SystemID = packet.ReadInt32("SystemID", indexes);
+            }
+            if (changesMask[0])
+            {
+                if (changesMask[3])
+                {
+                    data.LoadoutNameLen = packet.ReadBits(9);
+                    data.LoadoutName = packet.ReadWoWString("LoadoutName", (int)data.LoadoutNameLen, indexes);
+                }
+            }
+            packet.ResetBitReader();
             return data;
         }
 
@@ -2966,8 +2914,8 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
             data.TransportServerTime = packet.ReadInt32("TransportServerTime", indexes);
             data.WeeklyRewardsPeriodSinceOrigin = packet.ReadUInt32("WeeklyRewardsPeriodSinceOrigin", indexes);
             data.DEBUGSoulbindConduitRank = packet.ReadInt16("DEBUGSoulbindConduitRank", indexes);
-            data.Unk1000_2.Resize(packet.ReadUInt32());
-            data.Unk1000_3 = packet.ReadInt32("Unk1000_3", indexes);
+            data.TraitConfigs.Resize(packet.ReadUInt32());
+            data.ActiveTraitConfigID = packet.ReadInt32("ActiveTraitConfigID", indexes);
             for (var i = 0; i < data.KnownTitles.Count; ++i)
             {
                 data.KnownTitles[i] = packet.ReadUInt64("KnownTitles", indexes, i);
@@ -3072,9 +3020,9 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
             {
                 data.CharacterRestrictions[i] = ReadCreateCharacterRestriction(packet, indexes, "CharacterRestrictions", i);
             }
-            for (var i = 0; i < data.Unk1000_2.Count; ++i)
+            for (var i = 0; i < data.TraitConfigs.Count; ++i)
             {
-                data.Unk1000_2[i] = ReadCreateActivePlayerUnk1000_2(packet, indexes, "Unk1000_2", i);
+                data.TraitConfigs[i] = ReadCreateTraitConfig(packet, indexes, "TraitConfig", i);
             }
             return data;
         }
@@ -3227,7 +3175,7 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
                 }
                 if (changesMask[28])
                 {
-                    data.Unk1000_2.ReadUpdateMask(packet);
+                    data.TraitConfigs.ReadUpdateMask(packet);
                 }
             }
             packet.ResetBitReader();
@@ -3465,11 +3413,11 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
                 }
                 if (changesMask[28])
                 {
-                    for (var i = 0; i < data.Unk1000_2.Count; ++i)
+                    for (var i = 0; i < data.TraitConfigs.Count; ++i)
                     {
-                        if (data.Unk1000_2.UpdateMask[i])
+                        if (data.TraitConfigs.UpdateMask[i])
                         {
-                            data.Unk1000_2[i] = ReadUpdateActivePlayerUnk1000_2(packet, data.Unk1000_2[i] as ActivePlayerUnk1000_2, indexes, "Unk1000_2", i);
+                            data.TraitConfigs[i] = ReadUpdateTraitConfigs(packet, data.TraitConfigs[i] as TraitConfig, indexes, "TraitConfigs", i);
                         }
                     }
                 }
@@ -3790,10 +3738,9 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
                 {
                     data.DEBUGSoulbindConduitRank = packet.ReadInt16("DEBUGSoulbindConduitRank", indexes);
                 }
-                // 0x20000 gap
-                if (changesMask[113])
+                if (changesMask[114])
                 {
-                    data.Unk1000_3 = packet.ReadInt32("Unk1000_3", indexes);
+                    data.ActiveTraitConfigID = packet.ReadInt32("ActiveTraitConfigID", indexes);
                 }
             }
             if (changesMask[98])
@@ -3810,7 +3757,7 @@ namespace WowPacketParserModule.V10_0_0_46181.UpdateFields.V10_0_0_46181
                         data.QuestSession = ReadUpdateQuestSession(packet, data.QuestSession as QuestSession, indexes, "QuestSession");
                     }
                 }
-                if (changesMask[114])
+                if (changesMask[113])
                 {
                     Substructures.MythicPlusHandler.ReadDungeonScoreData(packet, indexes, "DungeonScore");
                 }

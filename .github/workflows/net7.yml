@@ -33,12 +33,13 @@ jobs:
     - name: Execute unit tests
       run: dotnet test --no-restore
 
-    - name: Publish
-      run: dotnet publish
+    - if: matrix.configuration == 'Release'
+      name: Publish
+      run: dotnet publish --configuration ${{ matrix.configuration }} --no-restore
       
     - if: matrix.configuration == 'Release'
       name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: WPP
+        name: WPP-${{ matrix.os }}-${{ matrix.configuration }}
         path: /home/runner/work/WowPacketParser/WowPacketParser/WowPacketParser/bin/${{ matrix.configuration }}/publish/

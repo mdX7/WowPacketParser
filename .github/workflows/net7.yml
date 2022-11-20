@@ -42,4 +42,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: WPP-${{ matrix.os }}-${{ matrix.configuration }}
-        path: bin/${{ matrix.configuration }}/publish/
+        path: ./bin/${{ matrix.configuration }}/publish/

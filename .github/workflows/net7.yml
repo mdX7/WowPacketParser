@@ -25,7 +25,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-        include-prerelease: true
 
     - name: Install dependencies
       run: dotnet restore
@@ -35,3 +34,6 @@ jobs:
       
     - name: Execute unit tests
       run: dotnet test --no-restore
+
+    - name: Publish
+      run: dotnet publish

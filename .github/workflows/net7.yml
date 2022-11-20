@@ -37,3 +37,9 @@ jobs:
 
     - name: Publish
       run: dotnet publish
+      
+    - name: Upload Artifacts
+      uses: actions/upload-artifacts@v2
+      with:
+        name: WPP
+        path: /home/runner/work/WowPacketParser/WowPacketParser/WowPacketParser/bin/${{ matrix.configuration }}/Parsers/publish/

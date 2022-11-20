@@ -32,17 +32,9 @@ jobs:
       
     - name: Execute unit tests
       run: dotnet test --configuration ${{ matrix.configuration }} --no-build
-
-    - if: matrix.configuration == 'Release'
-      name: Publish
-      run: dotnet publish --configuration ${{ matrix.configuration }} --no-build
       
-    - name: Echo
-      run: pwd
-      
-    - if: matrix.configuration == 'Release'
-      name: Upload Artifacts
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: WPP-${{ matrix.os }}-${{ matrix.configuration }}
-        path: WowPacketParser/bin/${{ matrix.configuration }}/publish/
+        path: WowPacketParser/bin/${{ matrix.configuration }}/

@@ -66,10 +66,9 @@ namespace WowPacketParser.Store.Objects.UpdateFields
         int?[] Resistances { get; }
         int? BaseMana { get; }
         int? BaseHealth { get; }
-        byte Race { get; }
-        int[] Stats { get; }
-        int[] StatPosBuff { get; }
-        int[] StatNegBuff { get; }
+        int?[] Stats { get; }
+        int?[] StatPosBuff { get; }
+        int?[] StatNegBuff { get; }
     }
 
     public interface IMutableUnitData : IUnitData

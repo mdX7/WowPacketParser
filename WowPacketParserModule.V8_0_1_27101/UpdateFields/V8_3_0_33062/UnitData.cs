@@ -81,9 +81,9 @@ namespace WowPacketParserModule.V8_0_1_27101.UpdateFields.V8_3_0_33062
         public float ModTimeRate { get; set; }
         public int? CreatedBySpell { get; set; }
         public int? EmoteState { get; set; }
-        public int[] Stats { get; } = new int[4];
-        public int[] StatPosBuff { get; } = new int[4];
-        public int[] StatNegBuff { get; } = new int[4];
+        public int?[] Stats { get; } = new int?[4];
+        public int?[] StatPosBuff { get; } = new int?[4];
+        public int?[] StatNegBuff { get; } = new int?[4];
         public int?[] Resistances { get; } = new int?[7];
         public int[] BonusResistanceMods { get; } = new int[7];
         public int[] PowerCostModifier { get; } = new int[7];

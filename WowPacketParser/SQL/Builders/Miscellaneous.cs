@@ -178,6 +178,10 @@ namespace WowPacketParser.SQL.Builders
 
             foreach (var stats in store)
             {
+                var race = (int)stats.Item1.Race;
+                if (race == 0)
+                    continue;
+
                 var strEmpty = false;
                 var agiEmpty = false;
                 var intEmpty = false;
@@ -195,7 +199,6 @@ namespace WowPacketParser.SQL.Builders
                 // subtract racial values
                 if (SQLDatabase.PlayerRaceStats.Count > 0)
                 {
-                    var race = (int)stats.Item1.Race;
                     if (!strEmpty)
                         stats.Item1.Strength -= SQLDatabase.PlayerRaceStats[race][(int)StatType.Strength];
                     if (!agiEmpty)

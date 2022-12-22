@@ -113,23 +113,33 @@ namespace WowPacketParserModule.V8_0_1_27101.Parsers
                                         if (data.Level == 0)
                                             continue;
 
+                                        if (player.Race == Race.None && player.UnitData.Race != null)
+                                            player.Race = (Race)player.UnitData.Race;
+                                        if (player.Class == Class.None && player.UnitData.ClassId != null)
+                                            player.Class = (Class)player.UnitData.ClassId;
+
                                         // we're not trusting these races due to their racial being in the base values and we are too lazy to calculate, sorry folks
                                         if (player.Race == Race.Draenei || player.Race == Race.Tauren)
                                             continue;
 
                                         var level = data.Level;
-                                        if (data.EffectiveLevel != 0)
+                                        if (data.EffectiveLevel != null && data.EffectiveLevel != 0)
                                             level = data.EffectiveLevel;
+
+                                        int strOffset = (int)(-(data.StatPosBuff[(int)StatType.Strength] ?? 0) - (data.StatNegBuff[(int)StatType.Strength] ?? 0));
+                                        int agiOffset = (int)(-(data.StatPosBuff[(int)StatType.Agility] ?? 0) - (data.StatNegBuff[(int)StatType.Agility] ?? 0));
+                                        int intOffset = (int)(-(data.StatPosBuff[(int)StatType.Intellect] ?? 0) - (data.StatNegBuff[(int)StatType.Intellect] ?? 0));
+                                        int staOffset = (int)(-(data.StatPosBuff[(int)StatType.Stamina] ?? 0) - (data.StatNegBuff[(int)StatType.Stamina] ?? 0));
 
                                         PlayerClassLevelStats stats = new PlayerClassLevelStats()
                                         {
                                             Race = player.Race,
                                             Class = player.Class,
                                             Level = (byte)level,
-                                            Strength = data.Stats[(int)StatType.Strength] - data.StatPosBuff[(int)StatType.Strength] - data.StatNegBuff[(int)StatType.Strength],
-                                            Agility = data.Stats[(int)StatType.Agility] - data.StatPosBuff[(int)StatType.Agility] - data.StatNegBuff[(int)StatType.Agility],
-                                            Intellect = data.Stats[(int)StatType.Intellect] - data.StatPosBuff[(int)StatType.Intellect] - data.StatNegBuff[(int)StatType.Intellect],
-                                            Stamina = data.Stats[(int)StatType.Stamina] - data.StatPosBuff[(int)StatType.Stamina] - data.StatNegBuff[(int)StatType.Stamina]
+                                            Strength = data.Stats[(int)StatType.Strength] + strOffset,
+                                            Agility = data.Stats[(int)StatType.Agility] + agiOffset,
+                                            Intellect = data.Stats[(int)StatType.Intellect] + intOffset,
+                                            Stamina = data.Stats[(int)StatType.Stamina] + staOffset
                                         };
                                         Storage.PlayerClassLevelStatsContainer.Add((player.Class, level), stats);
                                     }

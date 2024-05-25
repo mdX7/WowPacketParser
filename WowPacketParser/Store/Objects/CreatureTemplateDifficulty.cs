@@ -33,17 +33,13 @@ namespace WowPacketParser.Store.Objects
         [DBFieldName("TypeFlags2", TargetedDatabaseFlag.SinceDragonflight | TargetedDatabaseFlag.WotlkClassic)]
         public uint? TypeFlags2;
 
-        public bool WDBEqualsSkipDifficultySkipHealthScalingExpansion(CreatureTemplateDifficultyWDB rhs)
+        public bool IsCreatureDifficultyIDEqual(CreatureTemplateDifficultyWDB rhs)
         {
             if (rhs == null)
                 return false;
 
             return Entry == rhs.Entry &&
-                Math.Abs(HealthModifier.Value - rhs.HealthModifier.Value) < 0.01f &&
-                Math.Abs(ManaModifier.Value - rhs.ManaModifier.Value) < 0.01f &&
-                CreatureDifficultyID == rhs.CreatureDifficultyID &&
-                TypeFlags == rhs.TypeFlags &&
-                TypeFlags2 == rhs.TypeFlags2;
+                CreatureDifficultyID == rhs.CreatureDifficultyID;
         }
     }
 
@@ -105,5 +101,17 @@ namespace WowPacketParser.Store.Objects
 
         [DBFieldName("VerifiedBuild")]
         public int? VerifiedBuild = ClientVersion.BuildInt;
+
+        // for fallback reasons
+        public int? CreatureDifficultyID = null;
+
+        public bool IsCreatureDifficultyIDEqual(CreatureTemplateDifficultyWDB rhs)
+        {
+            if (rhs == null)
+                return false;
+
+            return Entry == rhs.Entry &&
+                CreatureDifficultyID == rhs.CreatureDifficultyID;
+        }
     }
 }

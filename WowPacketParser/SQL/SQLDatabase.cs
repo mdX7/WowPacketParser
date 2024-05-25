@@ -330,7 +330,7 @@ namespace WowPacketParser.SQL
             if (CreatureTemplateDifficultyWDBData.TryGetValue((sniffData.Entry.Value, difficulty), out var dbData))
             {
                 // data is equal, return sniffData to update
-                if (sniffData.WDBEqualsSkipDifficultySkipHealthScalingExpansion(dbData))
+                if (sniffData.IsCreatureDifficultyIDEqual(dbData))
                 {
                     sniffData.DifficultyID = dbData.DifficultyID;
                     return sniffData;
@@ -347,6 +347,39 @@ namespace WowPacketParser.SQL
 
                 if (DBC.DBC.Difficulty.TryGetValue((int)difficulty, out var difficultyEntry))
                     return CheckCreatureTemplateDifficultyWDBFallbacks(sniffData, difficultyEntry.FallbackDifficultyID);
+            }
+            return sniffData;
+        }
+
+        public static CreatureTemplateDifficulty CheckCreatureTemplateDifficultyNonWDBFallbacks(CreatureTemplateDifficulty sniffData, uint difficulty)
+        {
+            // if db disabled/empty simply return sniff data
+            if (CreatureTemplateDifficultyWDBData.Count == 0)
+                return sniffData;
+
+            // entry with same difficulty already exists
+            if (CreatureTemplateDifficultyWDBData.TryGetValue((sniffData.Entry.Value, difficulty), out var dbData))
+            {
+                // data is equal, return sniffData to update
+                if (!sniffData.CreatureDifficultyID.HasValue)
+                {
+                    sniffData.CreatureDifficultyID = dbData.CreatureDifficultyID;
+                    sniffData.DifficultyID = dbData.DifficultyID;
+                }
+                else if (sniffData.IsCreatureDifficultyIDEqual(dbData))
+                    sniffData.DifficultyID = dbData.DifficultyID;
+
+                // data is not equal, insert new row
+                return sniffData;
+            }
+            // entry with same difficulty does not exist, check fallback difficulties recursively
+            else
+            {
+                if (!Settings.UseDBC || DBC.DBC.Difficulty == null)
+                    return sniffData;
+
+                if (DBC.DBC.Difficulty.TryGetValue((int)difficulty, out var difficultyEntry))
+                    return CheckCreatureTemplateDifficultyNonWDBFallbacks(sniffData, difficultyEntry.FallbackDifficultyID);
             }
             return sniffData;
         }

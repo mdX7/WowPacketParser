@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using WowPacketParser.Enums;
 using WowPacketParser.Misc;
 using WowPacketParser.PacketStructures;
@@ -57,8 +58,28 @@ namespace WowPacketParserModule.V11_0_0_55666.Parsers
                 var type = (UpdateTypeCataclysm)packet.ReadByte();
 
                 var partWriter = new StringBuilderProtoPart(packet.Writer);
-                packet.AddValue("UpdateType", type.ToString(), i);
                 var guid = packet.ReadPackedGuid128("Object Guid", i);
+
+                if (type == UpdateTypeCataclysm.CreateObject1)
+                {
+                    var packetTimestamp = Utilities.GetUnixTimeFromDateTime(packet.Time);
+
+                    var spawnTimestamp = packetTimestamp & ~((1 << 23) - 1); // mask out 23 bits
+                    spawnTimestamp += guid.GetSpawnTimestamp() + 3600;
+
+                    var timestampDiff = Math.Abs(spawnTimestamp - packetTimestamp);
+
+                    packet.AddValue("PacketTimestamp", packetTimestamp);
+                    packet.AddValue("SpawnTimestamp", spawnTimestamp);
+                    packet.AddValue("PacketTimestamp", Utilities.GetDateTimeFromUnixTime(packetTimestamp).ToString("MM/dd/yyyy HH:mm:ss.fff"));
+                    packet.AddValue("SpawnTimestamp", Utilities.GetDateTimeFromUnixTime(spawnTimestamp).ToString("MM/dd/yyyy HH:mm:ss.fff"));
+                    packet.AddValue("timestampDiff", timestampDiff);
+
+                    if (!Storage.Objects.ContainsKey(guid) && timestampDiff <= 3)
+                        type = UpdateTypeCataclysm.CreateObject2;
+                }
+                packet.AddValue("UpdateType", type.ToString(), i);
+
                 switch (type)
                 {
                     case UpdateTypeCataclysm.Values:
